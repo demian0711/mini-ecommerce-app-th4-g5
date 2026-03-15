@@ -11,12 +11,12 @@ class CheckoutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Checkout')),
+      appBar: AppBar(title: const Text('Thanh toán')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Checkout Screen'),
+            const Text('Màn hình thanh toán'),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {

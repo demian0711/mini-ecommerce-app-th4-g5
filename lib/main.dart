@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'models/product.dart';
 import 'providers/cart_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/product_provider.dart';
@@ -32,10 +33,18 @@ class MiniECommerceApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (_) => const HomeScreen(),
-          '/detail': (_) => const ProductDetailScreen(),
           '/cart': (_) => const CartScreen(),
           '/checkout': (_) => const CheckoutScreen(),
           '/orders': (_) => const OrdersScreen(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == '/detail' && settings.arguments != null) {
+            final product = settings.arguments as Product;
+            return MaterialPageRoute(
+              builder: (_) => ProductDetailScreen(product: product),
+            );
+          }
+          return null;
         },
       ),
     );

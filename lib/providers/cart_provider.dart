@@ -8,13 +8,30 @@ class CartProvider extends ChangeNotifier {
 
   List<CartItem> get items => _items;
 
-  void addItem(Product product) {
-    final index = _items.indexWhere((item) => item.product.id == product.id);
+  void addItem(
+    Product product, {
+    int quantity = 1,
+    String? size,
+    String? color,
+  }) {
+    final index = _items.indexWhere(
+      (item) =>
+          item.product.id == product.id &&
+          item.size == size &&
+          item.color == color,
+    );
 
     if (index >= 0) {
-      _items[index].quantity += 1;
+      _items[index].quantity += quantity;
     } else {
-      _items.add(CartItem(product: product));
+      _items.add(
+        CartItem(
+          product: product,
+          quantity: quantity,
+          size: size,
+          color: color,
+        ),
+      );
     }
 
     notifyListeners();
@@ -62,6 +79,10 @@ class CartProvider extends ChangeNotifier {
   }
 
   int get totalItems => _items.length;
+
+  int get totalQuantity {
+    return _items.fold(0, (sum, item) => sum + item.quantity);
+  }
 
   double get totalPrice {
     return _items
