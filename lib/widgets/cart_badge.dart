@@ -9,17 +9,19 @@ class CartBadge extends StatelessWidget {
     this.onTap,
     this.iconColor,
     this.badgeColor,
+    this.backgroundColor,
   });
 
   final VoidCallback? onTap;
   final Color? iconColor;
   final Color? badgeColor;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<CartProvider>(
       builder: (context, cart, _) {
-        final count = cart.totalQuantity;
+        final count = cart.totalItems;
 
         return InkWell(
           onTap: onTap,
@@ -27,14 +29,28 @@ class CartBadge extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              Icon(
-                Icons.shopping_cart_outlined,
-                color: iconColor,
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: backgroundColor ?? Colors.transparent,
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: backgroundColor == null
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                ),
+                child: Icon(Icons.shopping_cart_outlined, color: iconColor),
               ),
               if (count > 0)
                 Positioned(
-                  right: -6,
-                  top: -6,
+                  right: -4,
+                  top: -4,
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
                     transitionBuilder: (child, animation) {
