@@ -7,6 +7,6 @@ void main() {
     await tester.pumpWidget(const MiniECommerceApp());
 
     expect(find.text('TH4 - Nhóm [Số nhóm]'), findsOneWidget);
-    expect(find.text('Home Screen'), findsOneWidget);
+    expect(find.text('Tìm kiếm sản phẩm'), findsOneWidget);
   });
 }
