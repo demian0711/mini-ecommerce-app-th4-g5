@@ -56,8 +56,6 @@ class CartProvider extends ChangeNotifier {
 
     if (_items[index].quantity > 1) {
       _items[index].quantity -= 1;
-    } else {
-      _items.removeAt(index);
     }
 
     notifyListeners();
@@ -90,8 +88,20 @@ class CartProvider extends ChangeNotifier {
         .fold(0, (sum, item) => sum + (item.product.price * item.quantity));
   }
 
+<<<<<<< HEAD
   void clearCart() {
     _items.clear();
     notifyListeners();
+=======
+  bool get areAllSelected {
+    if (_items.isEmpty) return false;
+    return _items.every((item) => item.isSelected);
+  }
+
+  int get totalSelectedQuantity {
+    return _items
+        .where((item) => item.isSelected)
+        .fold(0, (sum, item) => sum + item.quantity);
+>>>>>>> main
   }
 }
