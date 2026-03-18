@@ -89,4 +89,20 @@ class CartProvider extends ChangeNotifier {
         .where((item) => item.isSelected)
         .fold(0, (sum, item) => sum + (item.product.price * item.quantity));
   }
+
+  void clearCart() {
+    _items.clear();
+    notifyListeners();
+  }
+
+  bool get areAllSelected {
+    if (_items.isEmpty) return false;
+    return _items.every((item) => item.isSelected);
+  }
+
+  int get totalSelectedQuantity {
+    return _items
+        .where((item) => item.isSelected)
+        .fold(0, (sum, item) => sum + item.quantity);
+  }
 }

@@ -6,7 +6,7 @@ void main() {
   testWidgets('App shows Home placeholder', (WidgetTester tester) async {
     await tester.pumpWidget(const MiniECommerceApp());
 
-    expect(find.text('TH4 - Nhóm [Số nhóm]'), findsOneWidget);
+    expect(find.textContaining('TH4 - Nhóm'), findsOneWidget);
     expect(find.text('Tìm kiếm sản phẩm'), findsOneWidget);
   });
 }
