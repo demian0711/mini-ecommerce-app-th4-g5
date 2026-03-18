@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/order.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/order_provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -13,12 +15,30 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   String _paymentMethod = 'COD';
 
-  // Xử lý nút Đặt Hàng
   void _handlePlaceOrder() {
+    final cartProvider = context.read<CartProvider>();
+    final orderProvider = context.read<OrderProvider>();
+
+    final selectedItems = cartProvider.items
+        .where((item) => item.isSelected)
+        .toList();
+
+    if (selectedItems.isEmpty) return;
+
+    final order = Order(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      items: selectedItems,
+      totalPrice: cartProvider.totalPrice,
+      date: DateTime.now(),
+      status: 'pending',
+    );
+
+    orderProvider.addOrder(order);
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -37,10 +57,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
               onPressed: () {
-                context.read<CartProvider>().clearCart();
-
-                Navigator.pop(context); // Đóng Dialog
-                // Đẩy thẳng về màn hình Trang chủ (màn hình đầu tiên)
+                cartProvider.clearCart();
+                Navigator.of(dialogContext).pop();
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
               child: const Text(
@@ -54,7 +72,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  // Khối giao diện Địa chỉ
   Widget _buildAddressSection() {
     return Material(
       color: Colors.white,
@@ -120,7 +137,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
                   ],
                 ),
               );
@@ -164,8 +181,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     return Consumer<CartProvider>(
       builder: (context, cart, _) {
-        final selectedItems =
-            cart.items.where((item) => item.isSelected).toList();
+        final selectedItems = cart.items
+            .where((item) => item.isSelected)
+            .toList();
 
         return Scaffold(
           backgroundColor: Colors.grey[100],
@@ -183,8 +201,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               children: [
                 _buildAddressSection(),
                 const SizedBox(height: 8),
-
-                // Phần Sản phẩm
                 Container(
                   color: Colors.white,
                   padding: const EdgeInsets.all(16),
@@ -199,7 +215,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // Nếu mảng rỗng thì hiện thông báo, ngược lại thì render list
                       selectedItems.isEmpty
                           ? const Text(
                               'Chưa có sản phẩm nào trong giỏ hàng.',
@@ -228,14 +243,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                           errorBuilder:
                                               (context, error, stackTrace) =>
                                                   Container(
-                                            width: 60,
-                                            height: 60,
-                                            color: Colors.grey[200],
-                                            child: const Icon(
-                                              Icons.image,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
+                                                    width: 60,
+                                                    height: 60,
+                                                    color: Colors.grey[200],
+                                                    child: const Icon(
+                                                      Icons.image,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
@@ -292,8 +307,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Phần Phương thức thanh toán
                 Container(
                   color: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -313,21 +326,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           ),
                         ),
                       ),
-                      RadioListTile<String>(
-                        activeColor: Colors.orange,
-                        title: const Text('Thanh toán khi nhận hàng (COD)'),
-                        value: 'COD',
+                      RadioGroup<String>(
                         groupValue: _paymentMethod,
-                        onChanged: (value) =>
-                            setState(() => _paymentMethod = value!),
-                      ),
-                      RadioListTile<String>(
-                        activeColor: Colors.orange,
-                        title: const Text('Ví MoMo'),
-                        value: 'MOMO',
-                        groupValue: _paymentMethod,
-                        onChanged: (value) =>
-                            setState(() => _paymentMethod = value!),
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() => _paymentMethod = value);
+                        },
+                        child: Column(
+                          children: const [
+                            RadioListTile<String>(
+                              activeColor: Colors.orange,
+                              title: Text('Thanh toán khi nhận hàng (COD)'),
+                              value: 'COD',
+                            ),
+                            RadioListTile<String>(
+                              activeColor: Colors.orange,
+                              title: Text('Ví MoMo'),
+                              value: 'MOMO',
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -378,9 +396,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       vertical: 12,
                     ),
                   ),
-                  onPressed: selectedItems.isEmpty
-                      ? null
-                      : _handlePlaceOrder,
+                  onPressed: selectedItems.isEmpty ? null : _handlePlaceOrder,
                   child: const Text(
                     'ĐẶT HÀNG',
                     style: TextStyle(
