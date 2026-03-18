@@ -250,7 +250,10 @@ class CartScreen extends StatelessWidget {
       ),
       bottomNavigationBar: Consumer<CartProvider>(
         builder: (context, cart, _) {
-          final hasSelectedItems = cart.totalPrice > 0;
+          final selectedItems = cart.items
+              .where((item) => item.isSelected)
+              .toList();
+          final hasSelectedItems = selectedItems.isNotEmpty;
 
           return SafeArea(
             top: false,
@@ -309,7 +312,7 @@ class CartScreen extends StatelessWidget {
                         disabledForegroundColor: Colors.grey[600],
                       ),
                       child: Text(
-                        'Thanh toán (${cart.totalSelectedQuantity} sản phẩm)',
+                        'Thanh toán (${cart.totalSelectedQuantity} sản phẩm - ${selectedItems.length} loại)',
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
