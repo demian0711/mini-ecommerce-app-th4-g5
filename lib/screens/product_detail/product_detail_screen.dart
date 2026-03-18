@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/product.dart';
@@ -21,6 +21,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   String? _selectedColor;
 
   List<String> get _gallery => [
+    widget.product.image,
     widget.product.image,
     widget.product.image,
     widget.product.image,
@@ -278,6 +279,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+              child: Row(
+                children: const [
+                  Icon(Icons.swap_horiz, size: 16, color: Colors.grey),
+                  SizedBox(width: 6),
+                  Text(
+                    'Vuốt ngang để xem thêm ảnh',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,6 +325,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
+                  const Text(
+                    'Phân loại',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
                   InkWell(
                     borderRadius: BorderRadius.circular(12),
                     onTap: () => _openVariantSheet(buyNow: false),
