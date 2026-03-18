@@ -56,8 +56,6 @@ class CartProvider extends ChangeNotifier {
 
     if (_items[index].quantity > 1) {
       _items[index].quantity -= 1;
-    } else {
-      _items.removeAt(index);
     }
 
     notifyListeners();
@@ -88,5 +86,16 @@ class CartProvider extends ChangeNotifier {
     return _items
         .where((item) => item.isSelected)
         .fold(0, (sum, item) => sum + (item.product.price * item.quantity));
+  }
+
+  bool get areAllSelected {
+    if (_items.isEmpty) return false;
+    return _items.every((item) => item.isSelected);
+  }
+
+  int get totalSelectedQuantity {
+    return _items
+        .where((item) => item.isSelected)
+        .fold(0, (sum, item) => sum + item.quantity);
   }
 }
