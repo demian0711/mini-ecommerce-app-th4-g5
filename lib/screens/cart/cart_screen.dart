@@ -106,17 +106,25 @@ class CartScreen extends StatelessWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/checkout'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-            child: Consumer<CartProvider>(
-              builder: (context, cart, _) =>
-                  Text('Đi tới Checkout (${cart.totalItems} loại)'),
-            ),
+          child: Consumer<CartProvider>(
+            builder: (context, cart, _) {
+              final selectedItems = cart.items
+                  .where((item) => item.isSelected)
+                  .toList();
+              return ElevatedButton(
+                onPressed: selectedItems.isEmpty
+                    ? null
+                    : () => Navigator.pushNamed(context, '/checkout'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: selectedItems.isEmpty
+                      ? Colors.grey
+                      : Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text('Đi tới Thanh toán (${cart.totalItems} loại)'),
+              );
+            },
           ),
         ),
       ),
