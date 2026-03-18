@@ -93,22 +93,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Product> _filterProducts(List<Product> products) {
-    if (_selectedCategory != null && _selectedCategory!.isNotEmpty) {
-      return products
+    var filtered = products;
+    final hasSelectedCategory =
+        _selectedCategory != null && _selectedCategory!.isNotEmpty;
+
+    if (hasSelectedCategory) {
+      filtered = filtered
           .where((product) => product.category == _selectedCategory)
-          .take(6)
           .toList();
     }
 
-    if (_searchQuery.trim().isEmpty) {
-      return products;
+    final keyword = _searchQuery.toLowerCase().trim();
+    if (keyword.isNotEmpty) {
+      filtered = filtered.where((product) {
+        if (hasSelectedCategory) {
+          return product.title.toLowerCase().contains(keyword);
+        }
+
+        return product.title.toLowerCase().contains(keyword) ||
+            product.category.toLowerCase().contains(keyword);
+      }).toList();
     }
 
-    final keyword = _searchQuery.toLowerCase().trim();
-    return products.where((product) {
-      return product.title.toLowerCase().contains(keyword) ||
-          product.category.toLowerCase().contains(keyword);
-    }).toList();
+    if (hasSelectedCategory) {
+      return filtered.take(6).toList();
+    }
+
+    return filtered;
   }
 
   IconData _iconForCategory(String category) {
