@@ -50,21 +50,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Text('Đặt hàng thành công!'),
             ],
           ),
-          content: Text('Phương thức: $_paymentMethod'),
+          content: const Text(
+            'Cảm ơn bạn đã mua sắm. Đơn hàng của bạn đang được xử lý.',
+          ),
           actions: [
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
               onPressed: () {
                 cartProvider.clearCart();
                 Navigator.of(dialogContext).pop();
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/orders',
-                  (route) => route.isFirst,
-                );
+                Navigator.of(context).popUntil((route) => route.isFirst);
               },
               child: const Text(
-                'Xem đơn hàng',
+                'Về Trang chủ',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -146,30 +144,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             },
           );
         },
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Row(
             children: [
-              const Text(
-                'Địa chỉ nhận hàng',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.location_on, color: Colors.orange),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Nguyễn Văn A\n0123 456 789\n123 Đường ABC, Quận 1, TP.HCM',
-                      style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+              Icon(Icons.location_on, color: Colors.orange),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Trang - 0987xxx',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const Icon(Icons.chevron_right),
-                ],
+                    SizedBox(height: 4),
+                    Text(
+                      '123 Đường ABC, Hà Nội',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
+              Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
         ),
@@ -201,8 +201,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               children: [
                 _buildAddressSection(),
                 const SizedBox(height: 8),
-
-                // Phần Sản phẩm
                 Container(
                   color: Colors.white,
                   padding: const EdgeInsets.all(16),
@@ -217,7 +215,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // Nếu mảng rỗng thì hiện thông báo, ngược lại thì render list
                       selectedItems.isEmpty
                           ? const Text(
                               'Chưa có sản phẩm nào trong giỏ hàng.',
@@ -310,8 +307,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Phần Phương thức thanh toán
                 Container(
                   color: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -338,17 +333,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           setState(() => _paymentMethod = value);
                         },
                         child: Column(
-                          children: [
+                          children: const [
                             RadioListTile<String>(
                               activeColor: Colors.orange,
-                              title: const Text(
-                                'Thanh toán khi nhận hàng (COD)',
-                              ),
+                              title: Text('Thanh toán khi nhận hàng (COD)'),
                               value: 'COD',
                             ),
                             RadioListTile<String>(
                               activeColor: Colors.orange,
-                              title: const Text('Ví MoMo'),
+                              title: Text('Ví MoMo'),
                               value: 'MOMO',
                             ),
                           ],

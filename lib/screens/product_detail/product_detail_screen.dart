@@ -21,10 +21,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   String? _selectedColor;
 
   List<String> get _gallery => [
-        widget.product.image,
-        widget.product.image,
-        widget.product.image,
-      ];
+    widget.product.image,
+    widget.product.image,
+    widget.product.image,
+    widget.product.image,
+  ];
 
   Future<void> _openVariantSheet({required bool buyNow}) async {
     final result = await showModalBottomSheet<_VariantSelection>(
@@ -195,17 +196,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       _selectedColor = result.color;
     });
 
+    // ignore: use_build_context_synchronously
     context.read<CartProvider>().addItem(
-          widget.product,
-          quantity: result.quantity,
-          size: result.size,
-          color: result.color,
-        );
+      widget.product,
+      quantity: result.quantity,
+      size: result.size,
+      color: result.color,
+    );
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Thêm thành công')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Thêm thành công')));
 
     if (buyNow) {
       Navigator.pushNamed(context, '/checkout');
@@ -217,9 +219,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final originalPrice = widget.product.price * 1.25;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chi tiết sản phẩm'),
-      ),
+      appBar: AppBar(title: const Text('Chi tiết sản phẩm')),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,6 +279,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+              child: Row(
+                children: const [
+                  Icon(Icons.swap_horiz, size: 16, color: Colors.grey),
+                  SizedBox(width: 6),
+                  Text(
+                    'Vuốt ngang để xem thêm ảnh',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,6 +325,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
+                  const Text(
+                    'Phân loại',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
                   InkWell(
                     borderRadius: BorderRadius.circular(12),
                     onTap: () => _openVariantSheet(buyNow: false),
@@ -345,10 +363,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: 20),
                   const Text(
                     'Mô tả chi tiết',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 8),
                   ExpandableText(widget.product.description),
@@ -366,7 +381,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, -4),
               ),

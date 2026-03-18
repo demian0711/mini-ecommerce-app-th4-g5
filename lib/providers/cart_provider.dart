@@ -56,8 +56,6 @@ class CartProvider extends ChangeNotifier {
 
     if (_items[index].quantity > 1) {
       _items[index].quantity -= 1;
-    } else {
-      _items.removeAt(index);
     }
 
     notifyListeners();
