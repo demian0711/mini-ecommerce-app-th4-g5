@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'models/product.dart';
 import 'providers/cart_provider.dart';
@@ -11,7 +12,18 @@ import 'screens/home/home_screen.dart';
 import 'screens/orders/orders_screen.dart';
 import 'screens/product_detail/product_detail_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Khởi tạo Firebase
+  try {
+    print('🔥 [Main] Initializing Firebase...');
+    await Firebase.initializeApp();
+    print('✅ [Main] Firebase initialized successfully');
+  } catch (e) {
+    print('❌ [Main] Firebase initialization error: $e');
+  }
+
   runApp(const MiniECommerceApp());
 }
 
@@ -32,7 +44,7 @@ class MiniECommerceApp extends StatelessWidget {
         theme: ThemeData(useMaterial3: true),
         initialRoute: '/',
         routes: {
-          '/': (_) => const HomeScreen(),
+          '/': (_) => const _InitializeCartWrapper(child: HomeScreen()),
           '/cart': (_) => const CartScreen(),
           '/checkout': (_) => const CheckoutScreen(),
           '/orders': (_) => const OrdersScreen(),
@@ -48,5 +60,32 @@ class MiniECommerceApp extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+/// Widget để khởi tạo CartProvider khi app start
+class _InitializeCartWrapper extends StatelessWidget {
+  final Widget child;
+
+  const _InitializeCartWrapper({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initializeCart(context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return child;
+      },
+    );
+  }
+
+  Future<void> _initializeCart(BuildContext context) async {
+    final cartProvider = context.read<CartProvider>();
+    await cartProvider.initialize();
   }
 }

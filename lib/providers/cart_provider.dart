@@ -2,11 +2,50 @@ import 'package:flutter/foundation.dart';
 
 import '../models/cart_item.dart';
 import '../models/product.dart';
+import '../services/cart_firebase_service.dart';
 
 class CartProvider extends ChangeNotifier {
   final List<CartItem> _items = [];
+  bool _isLoading = true;
+  final CartFirebaseService _firebaseService = CartFirebaseService();
 
   List<CartItem> get items => _items;
+  bool get isLoading => _isLoading;
+
+  /// Khởi tạo CartProvider và tải dữ liệu từ Firebase
+  Future<void> initialize() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      print('🔄 [CartProvider] Initializing...');
+
+      // Đăng nhập ẩn danh nếu chưa có user
+      if (_firebaseService.getCurrentUserId() == null) {
+        print('🔑 [CartProvider] Signing in anonymously...');
+        await _firebaseService.signInAnonymously();
+        print('✅ [CartProvider] Anonymous sign-in successful');
+      } else {
+        print(
+          '✅ [CartProvider] User already authenticated: ${_firebaseService.getCurrentUserId()}',
+        );
+      }
+
+      // Tải giỏ hàng từ Firebase
+      final savedItems = await _firebaseService.loadCart();
+      _items.clear();
+      _items.addAll(savedItems);
+
+      print(
+        '✅ [CartProvider] Initialization complete. Items: ${_items.length}',
+      );
+    } catch (e) {
+      print('❌ [CartProvider] Error initializing: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   void addItem(
     Product product, {
@@ -34,11 +73,13 @@ class CartProvider extends ChangeNotifier {
       );
     }
 
+    _saveCart();
     notifyListeners();
   }
 
   void removeItem(CartItem cartItem) {
     _items.remove(cartItem);
+    _saveCart();
     notifyListeners();
   }
 
@@ -47,6 +88,7 @@ class CartProvider extends ChangeNotifier {
     if (index == -1) return;
 
     _items[index].quantity += 1;
+    _saveCart();
     notifyListeners();
   }
 
@@ -58,6 +100,7 @@ class CartProvider extends ChangeNotifier {
       _items[index].quantity -= 1;
     }
 
+    _saveCart();
     notifyListeners();
   }
 
@@ -66,6 +109,7 @@ class CartProvider extends ChangeNotifier {
     if (index == -1) return;
 
     _items[index].isSelected = !_items[index].isSelected;
+    _saveCart();
     notifyListeners();
   }
 
@@ -73,6 +117,7 @@ class CartProvider extends ChangeNotifier {
     for (final item in _items) {
       item.isSelected = isSelected;
     }
+    _saveCart();
     notifyListeners();
   }
 
@@ -97,5 +142,19 @@ class CartProvider extends ChangeNotifier {
     return _items
         .where((item) => item.isSelected)
         .fold(0, (sum, item) => sum + item.quantity);
+  }
+
+  /// Xóa toàn bộ giỏ hàng
+  Future<void> clearCart() async {
+    _items.clear();
+    await _firebaseService.clearCart();
+    notifyListeners();
+  }
+
+  /// Lưu giỏ hàng lên Firebase
+  void _saveCart() {
+    _firebaseService.saveCart(_items).catchError((e) {
+      print('Error saving cart: $e');
+    });
   }
 }
