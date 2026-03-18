@@ -25,7 +25,7 @@ class CartScreen extends StatelessWidget {
               return Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color.fromARGB(255, 109, 174, 214),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
