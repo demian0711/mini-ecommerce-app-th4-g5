@@ -30,7 +30,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       items: selectedItems,
       totalPrice: cartProvider.totalPrice,
       date: DateTime.now(),
-      status: 'pending',
+      status: OrderStatus.pending,
     );
 
     orderProvider.addOrder(order);
@@ -57,9 +57,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
               onPressed: () {
-                cartProvider.clearCart();
+                cartProvider.removeSelectedItems();
                 Navigator.of(dialogContext).pop();
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/',
+                  (route) => false,
+                );
               },
               child: const Text(
                 'Về Trang chủ',

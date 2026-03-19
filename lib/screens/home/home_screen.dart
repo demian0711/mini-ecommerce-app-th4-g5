@@ -206,6 +206,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   actions: [
+                    IconButton(
+                      onPressed: () => Navigator.pushNamed(context, '/orders'),
+                      icon: const Icon(Icons.receipt_long_outlined),
+                      color: _isSearchBarSolid
+                          ? Colors.white
+                          : Colors.black87,
+                      tooltip: 'Đơn mua',
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(right: 12),
                       child: CartBadge(

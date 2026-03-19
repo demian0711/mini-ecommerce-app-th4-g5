@@ -2,11 +2,29 @@ import 'package:flutter/foundation.dart';
 
 import '../models/cart_item.dart';
 import '../models/product.dart';
+import '../services/cart_local_service.dart';
 
 class CartProvider extends ChangeNotifier {
   final List<CartItem> _items = [];
+  final CartLocalService _cartLocalService = CartLocalService();
+
+  CartProvider() {
+    _restoreCart();
+  }
 
   List<CartItem> get items => _items;
+
+  Future<void> _restoreCart() async {
+    final restoredItems = await _cartLocalService.loadCart();
+    _items
+      ..clear()
+      ..addAll(restoredItems);
+    notifyListeners();
+  }
+
+  void _persistCart() {
+    _cartLocalService.saveCart(_items);
+  }
 
   void addItem(
     Product product, {
@@ -35,11 +53,13 @@ class CartProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+    _persistCart();
   }
 
   void removeItem(CartItem cartItem) {
     _items.remove(cartItem);
     notifyListeners();
+    _persistCart();
   }
 
   void increaseQuantity(CartItem cartItem) {
@@ -48,6 +68,7 @@ class CartProvider extends ChangeNotifier {
 
     _items[index].quantity += 1;
     notifyListeners();
+    _persistCart();
   }
 
   void decreaseQuantity(CartItem cartItem) {
@@ -56,9 +77,9 @@ class CartProvider extends ChangeNotifier {
 
     if (_items[index].quantity > 1) {
       _items[index].quantity -= 1;
+      notifyListeners();
+      _persistCart();
     }
-
-    notifyListeners();
   }
 
   void toggleSelection(CartItem cartItem) {
@@ -67,6 +88,7 @@ class CartProvider extends ChangeNotifier {
 
     _items[index].isSelected = !_items[index].isSelected;
     notifyListeners();
+    _persistCart();
   }
 
   void toggleSelectAll(bool isSelected) {
@@ -74,6 +96,7 @@ class CartProvider extends ChangeNotifier {
       item.isSelected = isSelected;
     }
     notifyListeners();
+    _persistCart();
   }
 
   int get totalItems => _items.length;
@@ -91,6 +114,13 @@ class CartProvider extends ChangeNotifier {
   void clearCart() {
     _items.clear();
     notifyListeners();
+    _persistCart();
+  }
+
+  void removeSelectedItems() {
+    _items.removeWhere((item) => item.isSelected);
+    notifyListeners();
+    _persistCart();
   }
 
   bool get areAllSelected {
