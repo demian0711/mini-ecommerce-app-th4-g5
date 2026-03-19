@@ -7,6 +7,10 @@ class OrderProvider extends ChangeNotifier {
 
   List<Order> get orders => _orders;
 
+  List<Order> ordersByStatus(String status) {
+    return _orders.where((order) => order.status == status).toList();
+  }
+
   void addOrder(Order order) {
     _orders.insert(0, order);
     notifyListeners();

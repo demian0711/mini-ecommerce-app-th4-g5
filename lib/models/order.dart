@@ -1,5 +1,14 @@
 import 'cart_item.dart';
 
+class OrderStatus {
+  static const String pending = 'pending';
+  static const String shipping = 'shipping';
+  static const String delivered = 'delivered';
+  static const String canceled = 'canceled';
+
+  static const List<String> all = [pending, shipping, delivered, canceled];
+}
+
 class Order {
   final String id;
   final List<CartItem> items;
